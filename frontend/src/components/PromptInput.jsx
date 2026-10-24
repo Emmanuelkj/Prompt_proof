@@ -14,6 +14,8 @@ export default function PromptInput({
   setSelectedProvider,
   selectedModel,
   setSelectedModel,
+  scanScope,
+  setScanScope,
   apiKey,
   setApiKey,
   deepScan,
@@ -128,6 +130,21 @@ export default function PromptInput({
               </select>
             </div>
           )}
+
+          {/* Scope Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400 font-medium">Scope:</span>
+            <select
+              value={scanScope}
+              onChange={(e) => setScanScope(e.target.value)}
+              disabled={isRunning}
+              className="bg-[#0a0d14] border border-slate-700 text-cyan-300 font-medium rounded px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500 disabled:opacity-50"
+            >
+              <option value="quick">Quick Matrix (8 Attacks - Fast for Local Model)</option>
+              <option value="standard">Standard (16 Attacks)</option>
+              <option value="full">Full Audit (32 Attacks)</option>
+            </select>
+          </div>
 
           {/* Toggle deep scan */}
           <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">

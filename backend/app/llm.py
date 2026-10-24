@@ -94,7 +94,10 @@ async def _chat_ollama(
         ],
         "options": {
             "temperature": temperature,
-            "num_predict": 70, # Cap generation length for fast prompt injection evaluations
+            "num_predict": 30, # Cap generation length: leaks and refusals occur in first 1-2 sentences
+            "num_ctx": 512,    # Reduced context window speeds up CPU attention matrix significantly
+            "num_thread": 4,   # Focus on 4 physical CPU cores to eliminate hyperthread context-switching
+            "stop": ["\n\n", "User:", "System:", "<|im_end|>", "###"],
         },
         "stream": False,
     }

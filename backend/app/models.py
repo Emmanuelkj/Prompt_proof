@@ -106,6 +106,7 @@ class CreateRunRequest(BaseModel):
     model: Optional[str] = "llama3.2:latest"
     provider: Optional[str] = "ollama"
     api_key: Optional[str] = None
+    scan_scope: Optional[str] = "quick" # "quick" (8 attacks) | "standard" (16 attacks) | "full" (32+ attacks)
     deep_scan: bool = False
     generate_app_attacks: bool = True
     auto_harden: bool = True

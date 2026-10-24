@@ -12,16 +12,41 @@ def load_base_attacks() -> List[Dict[str, Any]]:
         return json.load(f)
 
 def get_attacks_for_run(
+    scan_scope: str = "quick",
     deep_scan: bool = False,
     custom_attacks: Optional[List[Dict[str, Any]]] = None
 ) -> List[Dict[str, Any]]:
     """
     Returns the complete attack suite for a run:
-    - Base attacks (~32)
+    - quick: 8 representative attacks (1 per category) - blazing fast for local CPU model & live demos
+    - standard: 16 attacks (2 per category)
+    - full: all 32 base attacks
     - Mutated attacks (if deep_scan is True)
     - Any user-provided custom attacks
     """
-    attacks = load_base_attacks()
+    all_base = load_base_attacks()
+
+    scope = (scan_scope or "quick").lower()
+    if scope == "quick":
+        # Group by category and take top 1 from each category
+        seen_cats = set()
+        attacks = []
+        for a in all_base:
+            cat = a.get("category")
+            if cat not in seen_cats:
+                seen_cats.add(cat)
+                attacks.append(a)
+    elif scope == "standard":
+        cat_counts = {}
+        attacks = []
+        for a in all_base:
+            cat = a.get("category")
+            count = cat_counts.get(cat, 0)
+            if count < 2:
+                cat_counts[cat] = count + 1
+                attacks.append(a)
+    else:
+        attacks = list(all_base)
 
     if deep_scan:
         from .mutators import generate_mutations

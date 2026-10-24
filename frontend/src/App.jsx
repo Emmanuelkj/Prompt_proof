@@ -17,6 +17,7 @@ export default function App() {
   const [selectedProvider, setSelectedProvider] = useState('ollama');
   const [selectedModel, setSelectedModel] = useState('llama3.2:latest');
   const [apiKey, setApiKey] = useState('');
+  const [scanScope, setScanScope] = useState('quick');
   const [deepScan, setDeepScan] = useState(false);
   const [generateAppAttacks, setGenerateAppAttacks] = useState(true);
 
@@ -105,6 +106,7 @@ export default function App() {
           model: selectedModel,
           provider: selectedProvider,
           api_key: apiKey,
+          scan_scope: scanScope,
           deep_scan: deepScan,
           generate_app_attacks: generateAppAttacks,
           auto_harden: true,
@@ -252,6 +254,8 @@ export default function App() {
           setSelectedProvider={setSelectedProvider}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
+          scanScope={scanScope}
+          setScanScope={setScanScope}
           apiKey={apiKey}
           setApiKey={setApiKey}
           deepScan={deepScan}

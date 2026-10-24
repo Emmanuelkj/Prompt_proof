@@ -155,14 +155,16 @@ async def check_benign_tasks(
     model: Optional[str] = None,
     provider: Optional[str] = None,
     api_key: Optional[str] = None,
+    max_tasks: int = 5,
 ) -> List[Dict[str, Any]]:
     """
-    Over-refusal check: Evaluates 5 benign tasks against both original and hardened prompts.
+    Over-refusal check: Evaluates routine benign tasks against both original and hardened prompts.
     Detects if the hardened prompt erroneously refuses legitimate requests.
     """
     benign_results = []
+    suite = BENIGN_TASK_SUITE[:max_tasks]
     
-    for item in BENIGN_TASK_SUITE:
+    for item in suite:
         task_query = item["task"]
         
         # Run against original prompt

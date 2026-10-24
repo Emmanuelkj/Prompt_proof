@@ -27,6 +27,7 @@ class TestRunner:
         self.provider = request_data.get("provider", "ollama")
         self.api_key = request_data.get("api_key")
         self.deep_scan = request_data.get("deep_scan", False)
+        self.scan_scope = request_data.get("scan_scope", "quick")
         self.generate_app_attacks = request_data.get("generate_app_attacks", True)
         self.auto_harden = request_data.get("auto_harden", True)
         self.custom_attacks = request_data.get("custom_attacks")
@@ -56,6 +57,7 @@ class TestRunner:
 
             # 2. Gather Attacks (Base + Mutators + Custom)
             all_attacks = get_attacks_for_run(
+                scan_scope=self.scan_scope,
                 deep_scan=self.deep_scan,
                 custom_attacks=self.custom_attacks,
             )
@@ -261,9 +263,10 @@ class TestRunner:
                 })
 
                 # 6. Benign tasks check (Over-refusal false-positive test)
+                max_b_tasks = 2 if (self.provider or "").lower() == "ollama" else 5
                 await self.emit("stage_update", {
                     "stage": "benign_check",
-                    "message": "Running 5 benign tasks to verify bot still answers legitimate queries..."
+                    "message": f"Running {max_b_tasks} benign tasks to verify bot still answers legitimate queries..."
                 })
 
                 benign_results = await check_benign_tasks(
@@ -272,6 +275,7 @@ class TestRunner:
                     model=self.model,
                     provider=self.provider,
                     api_key=self.api_key,
+                    max_tasks=max_b_tasks,
                 )
 
                 for b in benign_results:
