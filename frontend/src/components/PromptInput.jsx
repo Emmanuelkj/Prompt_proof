@@ -83,6 +83,23 @@ export default function PromptInput({
           placeholder="Enter your system prompt here... (e.g. You are a customer support bot. Answer questions about refunds...)"
           className="w-full bg-[#0a0d14] border border-slate-700/80 rounded-lg p-3 text-sm text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition resize-y disabled:opacity-60"
         />
+        {prompt.length > 800 && (
+          <div className="mt-1.5 p-2 rounded bg-amber-950/40 border border-amber-900/50 text-[11px] text-amber-300 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-400" />
+              Large prompt detected ({prompt.length} chars). On local CPU models, concise prompts evaluate up to 4x faster.
+            </span>
+            {samples?.length > 0 && (
+              <button
+                type="button"
+                onClick={() => onSelectSample(samples[0])}
+                className="underline hover:text-white font-semibold ml-2 shrink-0"
+              >
+                Reset to Weak Sample
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Configuration bar */}

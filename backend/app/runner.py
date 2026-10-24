@@ -100,9 +100,9 @@ class TestRunner:
                     return None
 
                 rendered = render_attack(attack["template"], ctx)
-                start_t = time.perf_counter()
                 
                 async with self.semaphore:
+                    start_t = time.perf_counter()
                     for attempt in range(3):
                         if self.is_cancelled:
                             return None
@@ -206,7 +206,10 @@ class TestRunner:
                 hardened_ctx = make_context(hardened_prompt)
                 rerun_results = []
 
-                for failed_att in failures:
+                # Cap re-testing to top 3 representative failures on local CPU to finish quickly
+                retest_targets = failures[:3] if (self.provider or "").lower() == "ollama" else failures
+
+                for failed_att in retest_targets:
                     if self.is_cancelled:
                         break
                     
