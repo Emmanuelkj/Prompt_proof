@@ -169,21 +169,6 @@ backend/tests/test_e2e.py::test_full_pipeline_mock_run PASSED
 
 ---
 
-## 7. 3-Minute Hackathon Demo Script
-
-1. **The Hook (30s):**  
-   "Every startup shipping an AI bot mixes trusted instructions with untrusted user text in one prompt. A single injection can exfiltrate instructions or trigger unauthorized refunds."
-2. **The Weak Prompt (45s):**  
-   Click the **Weak: Refund Support Bot** sample button. Click **Run Attack Matrix & Harden**. Watch the live table stream red failure badges across Direct Override, Canary Extraction, and Indirect Injection. The gauge reads ~16% resistance.
-3. **The Hardening & Regression Proof (45s):**  
-   Show the **AI Hardening Panel**. Point out the side-by-side prompt diff, the applied instruction hierarchy and boundary isolation, and the **30 of 30 mitigated vectors** flipping to green.
-4. **The False-Positive Check (30s):**  
-   Scroll to the **Benign Verification Panel**. Show that 5/5 routine customer questions still answer politely, proving hardening did not cause over-refusal.
-5. **Judge's Turn (30s):**  
-   Invite the judge to type their own custom injection in the **Interactive Playground** and execute it live against both prompts!
-
----
-
-## 8. License & Acknowledgements
+## 7. License & Acknowledgements
 
 Created for **Vibethon 2026** under the **AI for Cybersecurity** track. Built with FastAPI, React, Vite, Tailwind CSS, and Ollama.
