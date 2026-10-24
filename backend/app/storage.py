@@ -1,7 +1,7 @@
 import sqlite3
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from .config import DB_PATH
 
@@ -54,7 +54,11 @@ def init_db():
         """)
         conn.commit()
 
+# Ensure tables are always ready
+init_db()
+
 def save_run(run_id: str, user_prompt: str, model: str, provider: str):
+    init_db()
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
@@ -63,7 +67,7 @@ def save_run(run_id: str, user_prompt: str, model: str, provider: str):
             VALUES (?, ?, ?, ?, ?, ?)
         """, (
             run_id,
-            datetime.utcnow().isoformat(),
+            datetime.now(timezone.utc).isoformat(),
             "running",
             model,
             provider,

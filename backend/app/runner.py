@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 ACTIVE_RUNS: Dict[str, Dict[str, Any]] = {}
 
 class TestRunner:
+    __test__ = False
     def __init__(self, run_id: str, request_data: Dict[str, Any]):
         self.run_id = run_id
         self.user_prompt = request_data.get("prompt", "")

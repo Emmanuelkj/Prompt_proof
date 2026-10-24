@@ -1,6 +1,7 @@
 import json
 import asyncio
 from pathlib import Path
+from contextlib import asynccontextmanager
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,24 +17,17 @@ from .harness import make_context, render_attack
 from .judge import judge
 from .llm import chat
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
 app = FastAPI(
     title="PromptProof API",
     description="Deterministic Prompt Injection Tester, Hardener, and Regression Suite",
     version="1.0.0",
+    lifespan=lifespan,
 )
-
-# CORS configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.on_event("startup")
-def startup_event():
-    init_db()
 
 @app.get("/api/health")
 def health_check():
