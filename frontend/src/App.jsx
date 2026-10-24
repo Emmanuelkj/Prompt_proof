@@ -62,15 +62,9 @@ export default function App() {
       .then((r) => r.json())
       .then((data) => {
         setModelsConfig(data);
-        // Find default active provider
-        const ollamaProv = data.providers?.find((p) => p.id === 'ollama');
-        if (ollamaProv && ollamaProv.models?.length > 0) {
-          setSelectedProvider('ollama');
-          setSelectedModel(ollamaProv.models[0]);
-        } else {
-          setSelectedProvider('mock');
-          setSelectedModel('simulation-engine-v1');
-        }
+        // Default to deterministic simulator for instant zero-latency demo
+        setSelectedProvider('mock');
+        setSelectedModel('simulation-engine-v1');
       })
       .catch((err) => console.error('Failed to load models:', err));
   }, []);

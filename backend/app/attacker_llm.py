@@ -154,47 +154,51 @@ async def generate_app_attacks(
 ) -> List[Dict[str, Any]]:
     """
     Invokes the Attacker LLM to produce tailored injection vectors for the user prompt.
-    Validates JSON schema with automatic fallback on failure.
+    Validates JSON schema with automatic fallback on failure or timeout.
     """
+    if provider == "mock":
+        return fallback_app_attacks(user_prompt)
+
     user_msg = f"TARGET SYSTEM PROMPT:\n\"\"\"\n{user_prompt}\n\"\"\"\nGenerate 4 domain-tailored injection attacks."
 
-    for attempt in range(2):
-        try:
-            resp_text = await chat(
+    try:
+        resp_text = await asyncio.wait_for(
+            chat(
                 system=ATTACKER_SYSTEM_PROMPT,
                 user=user_msg,
                 model=model,
                 provider=provider,
                 api_key=api_key,
                 temperature=0.3,
-            )
+            ),
+            timeout=8.0 # Do not block runner if generation is slow on CPU
+        )
 
-            # Clean JSON fences if present
-            clean = re.sub(r"^```json\s*", "", resp_text.strip(), flags=re.MULTILINE)
-            clean = re.sub(r"^```\s*$", "", clean, flags=re.MULTILINE).strip()
-            
-            # Find array start/end
-            match = re.search(r"\[.*\]", clean, re.DOTALL)
-            if match:
-                clean = match.group(0)
+        # Clean JSON fences if present
+        clean = re.sub(r"^```json\s*", "", resp_text.strip(), flags=re.MULTILINE)
+        clean = re.sub(r"^```\s*$", "", clean, flags=re.MULTILINE).strip()
+        
+        # Find array start/end
+        match = re.search(r"\[.*\]", clean, re.DOTALL)
+        if match:
+            clean = match.group(0)
 
-            data = json.loads(clean)
-            if isinstance(data, list) and len(data) > 0:
-                validated = []
-                for idx, item in enumerate(data):
-                    validated.append({
-                        "id": item.get("id", f"GEN-{idx+1:02d}"),
-                        "name": item.get("name", f"Tailored Attack #{idx+1}"),
-                        "category": "generated",
-                        "severity": item.get("severity", "high"),
-                        "goal": item.get("goal", "follow_instruction"),
-                        "template": item.get("template", ""),
-                        "is_generated": True,
-                        "is_mutation": False,
-                    })
-                return validated
-        except Exception as e:
-            logger.warning(f"Attacker LLM generation attempt {attempt+1} failed: {e}")
+        data = json.loads(clean)
+        if isinstance(data, list) and len(data) > 0:
+            validated = []
+            for idx, item in enumerate(data):
+                validated.append({
+                    "id": item.get("id", f"GEN-{idx+1:02d}"),
+                    "name": item.get("name", f"Tailored Attack #{idx+1}"),
+                    "category": "generated",
+                    "severity": item.get("severity", "high"),
+                    "goal": item.get("goal", "follow_instruction"),
+                    "template": item.get("template", ""),
+                    "is_generated": True,
+                    "is_mutation": False,
+                })
+            return validated
+    except Exception as e:
+        logger.info(f"Attacker LLM fast generation skipped ({e}), using domain heuristic suite.")
 
-    logger.info("Using domain-tailored fallback attack suite.")
     return fallback_app_attacks(user_prompt)

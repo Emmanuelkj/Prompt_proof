@@ -94,11 +94,12 @@ async def _chat_ollama(
         ],
         "options": {
             "temperature": temperature,
+            "num_predict": 70, # Cap generation length for fast prompt injection evaluations
         },
         "stream": False,
     }
 
-    async with httpx.AsyncClient(timeout=timeout) as client:
+    async with httpx.AsyncClient(timeout=max(timeout, 60.0)) as client:
         resp = await client.post(url, json=payload)
         if resp.status_code == 429:
             raise RateLimitError("Ollama rate limited")

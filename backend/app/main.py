@@ -49,18 +49,18 @@ async def get_models():
     return {
         "providers": [
             {
-                "id": "ollama",
-                "name": "Ollama (Local / Zero Latency / 100% Free)",
-                "models": ollama_models if ollama_models else ["llama3.2:latest"],
-                "requires_key": False,
-                "is_active": len(ollama_models) > 0,
-            },
-            {
                 "id": "mock",
-                "name": "Deterministic Simulator (Instant Offline Demo)",
+                "name": "Deterministic Simulator (Instant Demo / Recommended)",
                 "models": ["simulation-engine-v1"],
                 "requires_key": False,
                 "is_active": True,
+            },
+            {
+                "id": "ollama",
+                "name": "Ollama Local (Real Local Model)",
+                "models": ollama_models if ollama_models else ["llama3.2:latest"],
+                "requires_key": False,
+                "is_active": len(ollama_models) > 0,
             },
             {
                 "id": "groq",

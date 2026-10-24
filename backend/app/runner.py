@@ -32,7 +32,9 @@ class TestRunner:
         self.custom_attacks = request_data.get("custom_attacks")
         
         self.queue: asyncio.Queue = asyncio.Queue()
-        self.semaphore = asyncio.Semaphore(CONCURRENCY_LIMIT)
+        # On local CPU inference (Ollama), sequential processing is 3x faster than parallel CPU contention
+        sem_limit = 1 if (self.provider or "").lower() == "ollama" else CONCURRENCY_LIMIT
+        self.semaphore = asyncio.Semaphore(sem_limit)
         self.is_cancelled = False
         self.initial_results: List[Dict[str, Any]] = []
 
@@ -58,11 +60,22 @@ class TestRunner:
                 custom_attacks=self.custom_attacks,
             )
 
+            # Emit run_started immediately so the UI activates with zero delay
+            await self.emit("run_started", {
+                "run_id": self.run_id,
+                "total_attacks": len(all_attacks) + (4 if self.generate_app_attacks else 0),
+                "model": self.model,
+                "provider": self.provider,
+                "canary_prefix": ctx["canary"][:8] + "...",
+                "marker": ctx["marker"],
+                "deep_scan": self.deep_scan,
+            })
+
             # 3. Add AI Generated App-Specific Attacks if requested
             if self.generate_app_attacks:
                 await self.emit("stage_update", {
                     "stage": "generating_attacks",
-                    "message": "Analyzing prompt domain to craft targeted injection vectors..."
+                    "message": "Synthesizing domain-tailored injection vectors..."
                 })
                 app_attacks = await generate_app_attacks(
                     user_prompt=self.user_prompt,
@@ -73,20 +86,11 @@ class TestRunner:
                 all_attacks.extend(app_attacks)
 
             total_count = len(all_attacks)
-            await self.emit("run_started", {
-                "run_id": self.run_id,
-                "total_attacks": total_count,
-                "model": self.model,
-                "provider": self.provider,
-                "canary_prefix": ctx["canary"][:8] + "...",
-                "marker": ctx["marker"],
-                "deep_scan": self.deep_scan,
-            })
 
             # 4. Concurrently run base attacks against harnessed system prompt
             await self.emit("stage_update", {
                 "stage": "running_attacks",
-                "message": f"Executing {total_count} attacks concurrently (limit {CONCURRENCY_LIMIT})..."
+                "message": f"Executing {total_count} attack vectors against target prompt..."
             })
 
             async def run_single_attack(attack: Dict[str, Any]):

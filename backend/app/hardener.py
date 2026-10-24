@@ -95,6 +95,9 @@ async def generate_hardened_prompt(
     Sends original prompt and anonymized failure summaries to the Hardener LLM.
     Returns hardened prompt and list of changes made.
     """
+    if provider == "mock":
+        return fallback_harden(user_prompt, failures)
+
     # Anonymize failures: only send category and reason, never raw canaries or sensitive markers
     failure_summaries = []
     seen = set()
@@ -114,35 +117,36 @@ async def generate_hardened_prompt(
         "Rewrite the prompt to harden it against these vulnerabilities while keeping its purpose intact."
     )
 
-    for attempt in range(2):
-        try:
-            resp_text = await chat(
+    try:
+        resp_text = await asyncio.wait_for(
+            chat(
                 system=HARDENER_SYSTEM_PROMPT,
                 user=user_msg,
                 model=model,
                 provider=provider,
                 api_key=api_key,
                 temperature=0.2,
-            )
+            ),
+            timeout=10.0
+        )
 
-            # Strip markdown fences
-            clean = re.sub(r"^```json\s*", "", resp_text.strip(), flags=re.MULTILINE)
-            clean = re.sub(r"^```\s*$", "", clean, flags=re.MULTILINE).strip()
-            
-            match = re.search(r"\{.*\}", clean, re.DOTALL)
-            if match:
-                clean = match.group(0)
+        # Strip markdown fences
+        clean = re.sub(r"^```json\s*", "", resp_text.strip(), flags=re.MULTILINE)
+        clean = re.sub(r"^```\s*$", "", clean, flags=re.MULTILINE).strip()
+        
+        match = re.search(r"\{.*\}", clean, re.DOTALL)
+        if match:
+            clean = match.group(0)
 
-            data = json.loads(clean)
-            if "hardened_prompt" in data and isinstance(data["hardened_prompt"], str):
-                return {
-                    "hardened_prompt": data["hardened_prompt"].strip(),
-                    "changes": data.get("changes", ["System prompt rewritten with security guardrails"]),
-                }
-        except Exception as e:
-            logger.warning(f"Hardener LLM attempt {attempt+1} failed: {e}")
+        data = json.loads(clean)
+        if "hardened_prompt" in data and isinstance(data["hardened_prompt"], str):
+            return {
+                "hardened_prompt": data["hardened_prompt"].strip(),
+                "changes": data.get("changes", ["System prompt rewritten with security guardrails"]),
+            }
+    except Exception as e:
+        logger.info(f"Hardener LLM fast generation skipped ({e}), using guardrail template.")
 
-    logger.info("Using proven fallback prompt hardening template.")
     return fallback_harden(user_prompt, failures)
 
 async def check_benign_tasks(
