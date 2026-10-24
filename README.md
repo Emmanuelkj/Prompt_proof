@@ -105,18 +105,36 @@ Hardening is useless if the bot refuses legitimate business operations. PromptPr
 - (Optional) [Ollama](https://ollama.ai) with `llama3.2:latest` or `llama3:latest` for 100% offline local inference.
 
 ### 1-Click Launch
+
+**On Linux / macOS:**
 ```bash
-git clone https://github.com/promptproof/promptproof.git
-cd PromptProof
+git clone https://github.com/Emmanuelkj/Prompt_proof.git
+cd Prompt_proof
 ./start.sh
 ```
+
+**On Windows:**
+```cmd
+git clone https://github.com/Emmanuelkj/Prompt_proof.git
+cd Prompt_proof
+start.bat
+```
+*(Or simply double-click `start.bat` in File Explorer)*
+
 Open **`http://localhost:8000`** in your browser.
 
 ### Development Mode (with hot reloading)
+
+**On Linux / macOS:**
 ```bash
 ./dev.sh
 ```
-- Backend runs on `http://localhost:8000`
+
+**On Windows:**
+```cmd
+dev.bat
+```
+- Backend runs on `http://localhost:8000` (interactive API documentation at `/docs`)
 - Frontend runs on `http://localhost:5173`
 
 ---
