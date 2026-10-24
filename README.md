@@ -2,7 +2,7 @@
 
 > **Vibethon Hackathon** (ENCIDE, Mar Athanasius College of Engineering)  
 > **Track:** AI for Cybersecurity (threat modeling, vulnerability detection, false-positive mitigation)  
-> **Live Web App:** `http://localhost:8000`
+> **Live Web App:** `http://promptproof.duckdns.org:8000`
 
 ---
 

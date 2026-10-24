@@ -1,0 +1,112 @@
+================================================================================
+PROMPTPROOF: COMPLETE USER PROMPT CHRONOLOGY
+The Step-by-Step Prompting Sequence Used to Build the Entire System from Scratch
+================================================================================
+
+PROMPT 1: Architecture, Problem Statement & Threat Modeling
+--------------------------------------------------------------------------------
+"I want to build 'PromptProof', a deterministic LLM prompt injection vulnerability scanner and automated prompt hardening engine for an AI cybersecurity hackathon. 
+
+The core problem is that LLMs flatten system instructions and untrusted user input into a single context window (OWASP LLM01), and existing scanners rely on subjective 'LLM-as-a-judge' evaluators that hallucinate and can be jailbroken themselves. Furthermore, when developers harden prompts, they often cause catastrophic over-refusals that break legitimate user queries.
+
+Design a clean 4-phase closed-loop architecture:
+1. Matrix Stress-Test: Instrument system prompts with cryptographic canary secrets (CANARY-XXXX) and two-part instruction markers (prefix ZX + suffix 4 digits). Concurrently stream 30+ categorized direct and indirect attack vectors.
+2. Deterministic Judge: A heuristic rule engine that inspects raw plain text for leaked canaries (exact, reversed, hex, base64, spaced) and joined markers. If a model refuses the attack but echoes the marker in its refusal, classify it as 'ambiguous' rather than a false failure.
+3. Automated Hardener & Re-Test: Synthesize an upgraded prompt using instruction hierarchy, XML untrusted data boundaries, and role locks. Re-run failed vectors to mathematically prove regression mitigation (Vulnerability Flips).
+4. Benign Utility Verification: Test 5 routine legitimate customer queries against both prompts to guarantee zero false-positive over-refusals.
+
+Give me the complete architecture diagram and directory layout for a FastAPI backend and React frontend."
+
+
+PROMPT 2: Core Security Engines (Attacks, Harness, Judge, Mutator, Scoring)
+--------------------------------------------------------------------------------
+"Implement the core security modules in Python under backend/app/:
+1. attacks.py: Build a comprehensive attack matrix of 30+ vectors categorized into: Indirect Injection (data payloads, customer reviews, support tickets), Direct Override, Canary Extraction, System Prompt Extraction, Jailbreaks & Roleplay, Delimiter & Tag Abuse, and Authority & Urgency Social Engineering.
+2. harness.py: Create make_context(prompt) that generates a unique UUID canary and random numeric marker, embedding them into a test harness with strict non-disclosure instructions. Add render_attack() to substitute markers into payloads.
+3. judge.py: Implement the deterministic judge function. Evaluate canary presence (including base64, hex, rot13, reversed, and spaced permutations), marker execution obedience, prompt n-gram overlap, and refusal echo heuristics. Return structured verdicts: 'pass', 'fail', or 'ambiguous' with clear explanatory reasons.
+4. mutator.py: Build deterministic payload mutators that transform attacks into base64 wrappers, spaced letters, leetspeak, and roleplay cloaking.
+5. scoring.py: Implement weighted severity calculations (Critical: 3x, High: 2x, Medium: 1.5x, Low: 1x) and category resistance breakdown formulas.
+
+Ensure all data structures use strict Pydantic v2 schemas."
+
+
+PROMPT 3: Automated Hardener, Regression Loop & Benign Checker
+--------------------------------------------------------------------------------
+"Implement the defensive hardening and regression pipeline in backend/app/hardener.py and runner.py:
+1. hardener.py: Create an automated hardening engine that analyzes specific attack failure categories and synthesizes an upgraded prompt. It must inject: (a) highest-priority instruction hierarchy, (b) strict untrusted boundary tags (<untrusted_user_input>), (c) anti-jailbreak role locks, (d) prompt confidentiality clauses, and (e) standardized refusal templates.
+2. Regression Engine: Automatically re-test every vector that breached the original prompt against the newly synthesized hardened prompt. Count 'Vulnerability Flips' (e.g., '9 of 9 fixed') and calculate the net resistance delta (+XX%).
+3. Benign Checker: Formulate 5 standard legitimate user business queries (pricing inquiry, business hours, order status, return policy, help request). Evaluate them against the hardened prompt to prove security did not cause over-refusal degradation."
+
+
+PROMPT 4: Async Orchestrator, Ollama/Simulator LLM Client & SSE Streaming API
+--------------------------------------------------------------------------------
+"Implement the asynchronous backend runner and FastAPI server:
+1. llm.py: Create an async chat client supporting: (a) Local Ollama API (http://localhost:11434), (b) Cloud OpenAI-compatible endpoints, and (c) A built-in zero-latency deterministic simulation engine (simulation-engine-v1) that demonstrates vulnerable vs. hardened prompts instantly with zero CPU load.
+2. runner.py: Use asyncio.Semaphore(4) for controlled concurrency. Feed real-time events into an asyncio.Queue for Server-Sent Events (SSE). Emit events for: run_started, stage_update, attack_result, score_update, hardened_prompt, rerun_result, score_comparison, benign_check_result, and done.
+3. storage.py: Configure an embedded SQLite database (WAL mode) to store runs, attack lists, telemetry, and generate exportable JSON audit reports.
+4. main.py: Expose REST endpoints: GET /api/health, GET /api/models, GET /api/samples, POST /api/runs, GET /api/runs/{id}/events (SSE), POST /api/runs/{id}/stop, GET /api/runs, GET /api/runs/{id}/report, and POST /api/custom-attack ('Judge's Turn' live playground). Mount frontend/dist as static files."
+
+
+PROMPT 5: Comprehensive Test Suite & Pytest Verification
+--------------------------------------------------------------------------------
+"Write an exhaustive automated test suite under backend/tests/ to verify the entire system:
+1. test_core.py: Test canary injection, template rendering, all canary encoding permutations (base64, hex, rot13, reversed, spaced), judge verdict correctness for leaks and refusals, scoring weights, mutators, and attack library loading.
+2. test_e2e.py: Test all FastAPI endpoints (/api/health, /api/models, /api/samples, /api/custom-attack against weak and hardened prompts) and the complete end-to-end audit/hardening/benign pipeline run using FastAPI TestClient.
+Make sure all tests pass without errors."
+
+
+PROMPT 6: CPU-Only Performance Optimization for Local Ollama
+--------------------------------------------------------------------------------
+"When running local Ollama (LLaMA 3.2) on CPU-only machines, full matrices can be slow or encounter swap throttling. Optimize the backend specifically for CPU inference:
+1. Cap generation tokens: Add num_predict: 25 to Ollama payload options so the model stops immediately after evaluating or refusing the injection rather than rambling for 30 seconds.
+2. Dynamic threading: Pass num_thread: 4 to maximize available vCPU cores without thrashing memory.
+3. Add an 8.0s timeout with immediate heuristic fallback during attack generation so slow local LLMs never stall the pipeline.
+4. Add scan scopes to the API and UI: 'quick' (8 high-yield vectors for 60s CPU audits), 'standard' (16 vectors), and 'full' (32+ vectors).
+5. Guardrail Deduplication: In the hardener, strip previous guardrail blocks before re-hardening so prompts don't recursively bloat into thousands of redundant characters."
+
+
+PROMPT 7: Frontend Application Architecture & Live Streaming
+--------------------------------------------------------------------------------
+"Build the frontend web application in React 18 with Vite and Tailwind CSS:
+1. Configure an EventSource SSE listener connected to /api/runs/{id}/events that updates the state dynamically as attacks finish.
+2. Build components for:
+   - Navbar: Live status indicator, model selector pill, and navigation modal triggers.
+   - PromptInput: System prompt textarea with character/token count, sample presets (Weak, Medium, Strong), scan scope selector (Quick, Standard, Full), and primary action button.
+   - StageProgress: Visual 4-stage pipeline stepper (Harness -> Stress Test -> Hardener -> Benign Verification).
+   - ScoreCard: Resistance gauge, quick counters (Tested, Passed, Breaches, Ambiguous), and per-category progress meters.
+   - AttackTable: Dense table with search, category filter pills, pass/fail status chips, and an expandable inspector drawer showing raw attack payload vs plain-text target response.
+   - HardeningPanel: Side-by-side prompt diff (Vulnerable vs Hardened), resistance gain indicator (+XX%), and regression re-test results.
+   - BenignCheckPanel: Checklist showing the 5 legitimate customer queries and their responses.
+   - InteractivePlayground ('Judge's Turn'): Sandbox allowing users to type custom jailbreak payloads, toggle between testing the Original vs Hardened prompt, and see real-time deterministic verdicts.
+   - Modals: Run History (with report downloads) and Methodology Architecture documentation."
+
+
+PROMPT 8: Premium UI Redesign (Obsidian Tactical Cybernetic Instrument)
+--------------------------------------------------------------------------------
+"Redesign the entire frontend to completely eliminate generic 'AI SaaS slop' (cliché purple glowing blobs, washed-out grey boxes, low-contrast text). Follow the design systems from xiaopu-ai/web-design, freshtechbro/claudedesignskills, and tenfoldmarc/website-builder-setup:
+1. Create DESIGN.md documenting a formal 9-part design system: Obsidian Tactical Cybernetic (Dark Tech L2).
+2. Canvas & Surfaces: Deep obsidian background (#04060A), container cards (#0B0F18), hairline borders (rgba(255,255,255,0.08)), subtle micro-grid pattern, and ambient top radial glow.
+3. Typography: Import Google Fonts Space Grotesk (headers), Inter (body), and JetBrains Mono (canaries, tokens, inspect drawers).
+4. Motion & Micro-interactions: Install framer-motion. Add smooth drawer expansions, perimeter SVG arc animations on the resistance score gauge, and pulsing status rings.
+5. Accessible Dual-Axis Accents: Emerald (#10B981) for verified passes, Crimson (#F43F5E) for breaches, Amber (#F59E0B) for ambiguous refusals, and Cyan (#00F2FE) for telemetry. Every status chip must pair an icon with a high-contrast text label (never color alone)."
+
+
+PROMPT 9: Cross-Platform Windows Batch Automation & Requirements
+--------------------------------------------------------------------------------
+"Ensure the project works natively on both Linux and Windows:
+1. Create start.bat: Detect Python in backend\venv, venv, or system PATH. Check for frontend/dist and build it if missing. Set PYTHONPATH and launch Uvicorn on http://localhost:8000.
+2. Create dev.bat: Launch both the FastAPI backend (--reload on port 8000) and the Vite frontend dev server (port 5173) in separate titled Windows console windows.
+3. Create setup.bat: 1-click Windows installer that creates the virtual environment, upgrades pip, installs backend dependencies, installs npm packages, and builds the frontend.
+4. Create backend/requirements.txt with pure Python wheels (fastapi, uvicorn, httpx, pydantic, python-dotenv, sse-starlette, pytest) that require no C++ build tools on Windows.
+5. Update README.md with dual Linux/macOS and Windows setup instructions."
+
+
+PROMPT 10: Production Deployment & Azure Cloud Automation
+--------------------------------------------------------------------------------
+"Prepare PromptProof for single-command production deployment on an Azure Linux VM with DuckDNS integration:
+1. Create deploy_azure.sh: An automated bash script that installs Python 3 venv, Node.js 20 LTS, and Nginx. Sets up a persistent systemd service (promptproof.service) with auto-restart on crashes and server reboots. Configures Nginx reverse proxy on port 80 with unbuffered SSE streaming proxy settings.
+2. Create a multi-stage Dockerfile and docker-compose.yml for containerized environments.
+3. Enable CORS middleware in backend/app/main.py allowing cross-origin requests from custom domains and ports.
+4. Set default backend hosts in the frontend to promptproof.duckdns.org:8000 while supporting local overrides.
+5. Document the required Azure Network Security Group (NSG) inbound port rules (ports 80, 443, 8000)."
+================================================================================
