@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  promptproof:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: promptproof
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PROMPTPROOF_PROVIDER=mock
+      - PROMPTPROOF_MODEL=simulation-engine-v1
+      - OLLAMA_HOST=http://host.docker.internal:11434
+    volumes:
+      - promptproof-data:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  promptproof-data:
