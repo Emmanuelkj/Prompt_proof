@@ -1,16 +1,753 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300f2fe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PromptProof | LLM Defense & Hardening Matrix</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-[#04060A] text-slate-100 min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptProof | Enterprise LLM Defense & Hardening</title>
+  <meta name="description" content="Automated prompt injection vulnerability auditing, defensive prompt synthesis, and regression verification for enterprise LLMs.">
+  
+  <!-- Modern Clean Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234f46e5'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z'/%3E%3C/svg%3E">
+</head>
+<body>
+
+  <!-- =========================================================================
+       Header & Navigation Bar
+       ========================================================================= -->
+  <header class="app-header">
+    <div class="header-container">
+      
+      <!-- Brand & Title -->
+      <div class="brand-wrapper">
+        <div class="brand-logo" title="PromptProof">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            PromptProof
+            <span class="brand-badge">ENTERPRISE DEFENSE</span>
+          </div>
+          <div class="brand-subtitle">Prompt Hardening & Vulnerability Mitigation Platform</div>
+        </div>
+      </div>
+
+      <!-- Clean Navigation Tabs -->
+      <nav class="nav-tabs" aria-label="Main Navigation">
+        <button class="nav-tab-btn active" data-tab="audit" id="nav-btn-audit">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+          </svg>
+          Security Audit
+        </button>
+        <button class="nav-tab-btn" data-tab="history" id="nav-btn-history">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Audit History
+        </button>
+      </nav>
+
+      <!-- Status Indicator & Configuration -->
+      <div class="header-actions">
+        <div class="status-indicator-pill" id="status-indicator-pill" title="System Connection Status">
+          <span class="status-dot active" id="status-dot"></span>
+          <span id="status-text">Connected</span>
+        </div>
+        <button class="btn-icon-soft" id="settings-btn" title="Platform Settings">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       Main Content Area
+       ========================================================================= -->
+  <main class="app-main">
+
+    <!-- -----------------------------------------------------------------------
+         TAB 1: SECURITY AUDIT & HARDENING
+         ----------------------------------------------------------------------- -->
+    <div class="tab-pane active" id="tab-audit">
+      <div class="audit-grid">
+
+        <!-- Left Column: System Prompt & Audit Controls -->
+        <div class="white-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon-badge">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+              </div>
+              <div>
+                <h1 class="card-title" style="font-size: 1rem; margin: 0;">Audit & Hardening Configuration</h1>
+                <div class="card-subtitle">Specify system instruction and evaluation target</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            
+            <!-- Preset Samples Bar -->
+            <div class="form-group">
+              <label class="form-label">
+                <span>Security Posture Presets</span>
+              </label>
+              <div class="preset-chips-scroll" id="preset-chips-container">
+                <!-- Dynamically populated chips -->
+              </div>
+            </div>
+
+            <!-- System Prompt Input -->
+            <div class="form-group">
+              <div class="form-label">
+                <span>Target System Prompt</span>
+                <span class="form-label-hint" id="char-counter">0 chars</span>
+              </div>
+              <textarea 
+                id="system-prompt-input" 
+                class="form-control code-mode" 
+                rows="6" 
+                placeholder="Enter system prompt to evaluate against prompt injection vectors..."
+              ></textarea>
+            </div>
+
+            <!-- Target Selection -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+              <div class="form-group">
+                <label class="form-label" for="provider-select">Provider</label>
+                <select id="provider-select" class="form-control form-select">
+                  <option value="mock">Local Simulator</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="model-select">Target Model</label>
+                <select id="model-select" class="form-control form-select">
+                  <option value="simulation-engine-v1">simulation-engine-v1</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- API Key (Conditional for Cloud) -->
+            <div class="form-group" id="api-key-group" style="display: none;">
+              <label class="form-label" for="api-key-input">
+                <span>Provider API Key</span>
+              </label>
+              <input type="password" id="api-key-input" class="form-control" placeholder="sk-...">
+            </div>
+
+            <!-- Scan Scope Preset -->
+            <div class="form-group">
+              <label class="form-label" for="scan-scope-select">
+                <span>Audit Scope</span>
+              </label>
+              <select id="scan-scope-select" class="form-control form-select">
+                <option value="quick">Quick Scan (Core 8 vectors - Fast)</option>
+                <option value="standard">Standard Scan (16 vectors - Recommended)</option>
+                <option value="full">Comprehensive Full Scan (32+ vectors)</option>
+              </select>
+            </div>
+
+            <!-- Security Toggles -->
+            <div class="form-group" style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 0.75rem 1rem; margin-top: 1rem;">
+              
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Automated Defensive Hardening</span>
+                  <span class="toggle-desc">Synthesizes immutable instruction boundaries and delimiters</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="auto-harden-toggle" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Contextual Attack Generation</span>
+                  <span class="toggle-desc">Synthesizes targeted injections for domain-specific context</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="generate-attacks-toggle" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <span class="toggle-title">Mutation & Evasion Permutations</span>
+                  <span class="toggle-desc">Tests combinatorial encoding and delimiter escape variants</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="deep-scan-toggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+            </div>
+
+            <!-- Launch Actions -->
+            <div style="margin-top: 1.25rem;">
+              <button type="button" class="btn-launch" id="launch-run-btn">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Launch Security Audit & Hardening
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right Column: Live Pipeline, Metrics, Diff & Vectors Matrix -->
+        <div>
+
+          <!-- Active Run Header Card -->
+          <div class="white-card pipeline-card" id="active-run-banner" style="display: none;">
+            
+            <div class="card-header" style="background: #ffffff;">
+              <div class="card-title-group">
+                <div class="ticker-radar" id="active-run-icon"></div>
+                <div>
+                  <div class="card-title" id="active-run-title">Audit in Progress</div>
+                  <div class="card-subtitle">Execution ID: <code id="active-run-id-display">run-...</code></div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.6rem;">
+                <button type="button" class="btn-danger-outline" id="stop-run-btn" style="display: none;">
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"/>
+                  </svg>
+                  Cancel Execution
+                </button>
+                <button type="button" class="btn-soft" id="download-report-btn" disabled>
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  </svg>
+                  Export Report (JSON)
+                </button>
+              </div>
+            </div>
+
+            <!-- Prominent Audit Completion Banner -->
+            <div id="audit-complete-banner" style="display: none; padding: 0.9rem 1.4rem; background: #ecfdf5; border-bottom: 1px solid #a7f3d0; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 26px; height: 26px; border-radius: 50%; background: #059669; color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-weight: 700; color: #065f46; font-size: 0.88rem;" id="completion-summary-title">Security Audit Complete — Remediations Verified</div>
+                  <div style="font-size: 0.75rem; color: #047857;" id="completion-summary-subtitle">All identified prompt injection vulnerabilities have been hardened and verified against regression.</div>
+                </div>
+              </div>
+              <button type="button" class="btn-soft" id="completion-export-btn" style="background: #ffffff; color: #059669; border-color: #a7f3d0; font-weight: 700; font-size: 0.78rem;">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Export Audit Report
+              </button>
+            </div>
+
+            <!-- Real-time 6-Stage Stepper -->
+            <div class="pipeline-stepper">
+              <div class="step-connector">
+                <div class="step-connector-fill" id="step-connector-fill"></div>
+              </div>
+
+              <div class="step-node active" id="step-harness">
+                <div class="step-circle">1</div>
+                <div class="step-title">Setup</div>
+              </div>
+
+              <div class="step-node" id="step-running-attacks">
+                <div class="step-circle">2</div>
+                <div class="step-title">Attack Matrix</div>
+              </div>
+
+              <div class="step-node" id="step-hardening">
+                <div class="step-circle">3</div>
+                <div class="step-title">Hardening</div>
+              </div>
+
+              <div class="step-node" id="step-rerunning">
+                <div class="step-circle">4</div>
+                <div class="step-title">Verification</div>
+              </div>
+
+              <div class="step-node" id="step-benign-checks">
+                <div class="step-circle">5</div>
+                <div class="step-title">Utility Probes</div>
+              </div>
+
+              <div class="step-node" id="step-done">
+                <div class="step-circle">6</div>
+                <div class="step-title">Certified</div>
+              </div>
+            </div>
+
+            <!-- Live Status Ticker -->
+            <div class="stage-ticker-bar">
+              <div class="ticker-left">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--primary-600);">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <span class="stage-message-text" id="stage-ticker-message">Initializing evaluation environment...</span>
+              </div>
+              <span class="badge-level badge-strong" id="pipeline-status-badge" style="font-size: 0.7rem;">LIVE PIPELINE</span>
+            </div>
+
+          </div>
+
+          <!-- Score Metrics Dashboard -->
+          <div class="metrics-summary-grid">
+            
+            <!-- Circular Gauge Card -->
+            <div class="metric-score-dial-card">
+              <div class="gauge-svg-wrapper">
+                <svg width="110" height="110" viewBox="0 0 100 100">
+                  <defs>
+                    <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#4f46e5"/>
+                      <stop offset="50%" stop-color="#10b981"/>
+                      <stop offset="100%" stop-color="#059669"/>
+                    </linearGradient>
+                  </defs>
+                  <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                  <circle class="gauge-progress" id="resistance-gauge-progress" cx="50" cy="50" r="45" stroke-dasharray="282.74" stroke-dashoffset="282.74"></circle>
+                </svg>
+                <div class="gauge-inner-text">
+                  <span class="gauge-number" id="resistance-score-value">0%</span>
+                  <span class="gauge-unit">RESISTANCE</span>
+                </div>
+              </div>
+              <div class="gauge-title">Vulnerability Resistance</div>
+              <div class="gauge-delta-badge" id="resistance-delta-badge" style="display: none;">
+                +0% Gained
+              </div>
+            </div>
+
+            <!-- Passed Vectors Card -->
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Defended Vectors</span>
+                <div class="stat-icon green">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value" id="stat-passed-count">0</div>
+              <div class="stat-footer">Neutralized adversarial inputs</div>
+            </div>
+
+            <!-- Breached Vectors Card -->
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Breaches Identified</span>
+                <div class="stat-icon red">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value" id="stat-failed-count">0</div>
+              <div class="stat-footer">Vulnerabilities in original prompt</div>
+            </div>
+
+            <!-- Flips (Healed) Count Card -->
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Vulnerabilities Remediated</span>
+                <div class="stat-icon purple">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value" id="stat-flips-count">0</div>
+              <div class="stat-footer">Verified healed via hardening</div>
+            </div>
+
+          </div>
+
+          <!-- Idle State Assessment Canvas (Shown before run starts) -->
+          <div class="idle-assessment-card" id="idle-assessment-card">
+            <div class="idle-shield-icon">
+              <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+            </div>
+            <div class="idle-title">Enterprise LLM Security Assessment Canvas</div>
+            <div class="idle-desc">
+              Audit system prompts against deterministic prompt injection payloads, canary extraction probes, and instruction hierarchy evasion attacks.
+            </div>
+            <div class="idle-steps-grid">
+              <div class="idle-step-item">
+                <div class="idle-step-num">Step 1</div>
+                <div class="idle-step-text">Configure system prompt & evaluation model</div>
+              </div>
+              <div class="idle-step-item">
+                <div class="idle-step-num">Step 2</div>
+                <div class="idle-step-text">Execute automated adversarial attack vectors</div>
+              </div>
+              <div class="idle-step-item">
+                <div class="idle-step-num">Step 3</div>
+                <div class="idle-step-text">Synthesize hardened prompt & export certificate</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Executive Security Posture Grade Card -->
+          <div class="posture-grade-card" id="posture-grade-card" style="display: none;">
+            <div class="posture-grade-left">
+              <div class="grade-badge-circle" id="posture-grade-badge">A+</div>
+              <div>
+                <div class="posture-title" id="posture-title">Security Posture: Production Certified</div>
+                <div class="posture-desc" id="posture-desc">All evaluated attack vectors neutralized with zero regression.</div>
+              </div>
+            </div>
+            <div class="posture-metrics-pills">
+              <div class="posture-metric-pill">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span id="posture-latency">Avg Latency: 48ms</span>
+              </div>
+              <div class="posture-metric-pill">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span id="posture-remediated">100% Remediated</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Threat Category Analytics & Visual Distribution Graph -->
+          <div class="white-card threat-analytics-card" id="threat-analytics-card" style="display: none;">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon-badge">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="card-title">Threat Category Resistance Analytics</div>
+                  <div class="card-subtitle">Comparative evaluation across attack vector categories</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Bars Grid -->
+            <div class="category-bars-container" id="category-bars-container">
+              <!-- Dynamically populated category breakdown bars -->
+            </div>
+
+            <!-- Severity Distribution Stacked Bar -->
+            <div style="padding: 0 1.4rem 1.25rem 1.4rem;">
+              <div class="severity-dist-wrapper">
+                <div class="severity-dist-header">
+                  <span>Attack Severity Posture Breakdown</span>
+                  <span id="severity-summary-stats">8 Total Vectors Evaluated</span>
+                </div>
+                <div class="severity-stacked-bar">
+                  <div class="stacked-segment stacked-critical" id="seg-critical" style="width: 25%;" title="Critical Severity"></div>
+                  <div class="stacked-segment stacked-high" id="seg-high" style="width: 37.5%;" title="High Severity"></div>
+                  <div class="stacked-segment stacked-medium" id="seg-medium" style="width: 37.5%;" title="Medium Severity"></div>
+                </div>
+                <div class="severity-legend">
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background: var(--crimson-500);"></span>
+                    <span id="legend-critical-text">Critical (2)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background: var(--amber-500);"></span>
+                    <span id="legend-high-text">High (3)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background: #3b82f6;"></span>
+                    <span id="legend-medium-text">Medium (3)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Attack Matrix Table Card -->
+          <div class="white-card">
+            
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon-badge">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="card-title">Adversarial Attack Matrix</div>
+                  <div class="card-subtitle">Continuous vector evaluation against active prompt</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="matrix-toolbar">
+              <div class="filter-pills">
+                <button type="button" class="filter-pill active" data-filter="all" id="pill-all">All Vectors</button>
+                <button type="button" class="filter-pill" data-filter="fail" id="pill-fail">Breached</button>
+                <button type="button" class="filter-pill" data-filter="pass" id="pill-pass">Defended</button>
+              </div>
+
+              <!-- Instant Search Input -->
+              <div class="matrix-search-box">
+                <svg class="matrix-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" id="matrix-search-input" class="matrix-search-input" placeholder="Search vectors by name or ID...">
+              </div>
+            </div>
+
+            <!-- Vectors Table -->
+            <div class="table-responsive">
+              <table class="attack-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Vector Category</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Evaluation Analysis</th>
+                    <th>Latency</th>
+                  </tr>
+                </thead>
+                <tbody id="attack-matrix-body">
+                  <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                      System ready. Click "Launch Security Audit & Hardening" to begin evaluation.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <!-- Hardened Prompt Diff Section -->
+          <div class="white-card diff-section-card" id="diff-section" style="display: none;">
+            
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon-badge" style="background: var(--emerald-50); color: var(--emerald-600);">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="card-title">Defensive Prompt Synthesis</div>
+                  <div class="card-subtitle">Side-by-side prompt diff with synthesized instruction guardrails</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn-soft" id="copy-hardened-btn">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                  Copy Prompt
+                </button>
+                <button type="button" class="btn-soft" id="download-prompt-btn">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  </svg>
+                  Download (.txt)
+                </button>
+                <button type="button" class="btn-soft" id="use-prompt-btn" style="background: var(--primary-50); color: var(--primary-600); border-color: var(--primary-100);">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Apply to Active Prompt
+                </button>
+              </div>
+            </div>
+
+            <!-- Diff View Container -->
+            <div class="diff-container">
+              <div class="diff-pane">
+                <div class="diff-pane-title">Original Prompt</div>
+                <div class="diff-code-box" id="original-prompt-diff"></div>
+              </div>
+              <div class="diff-pane">
+                <div class="diff-pane-title" style="color: var(--emerald-600);">Hardened Production Prompt</div>
+                <div class="diff-code-box hardened-highlight" id="hardened-prompt-diff"></div>
+              </div>
+            </div>
+
+            <!-- Injected Guardrails Bullet List -->
+            <div class="guardrails-list">
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.65rem;">
+                Synthesized Defenses
+              </div>
+              <div id="guardrails-list">
+                <!-- Guardrails items -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Benign Task Checks (Utility Preservation) -->
+          <div class="white-card benign-section-card" id="benign-section" style="display: none;">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon-badge" style="background: var(--sky-50); color: var(--sky-600);">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="card-title">Utility & False-Positive Verification</div>
+                  <div class="card-subtitle">Validates authentic operational performance and zero over-refusal</div>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="attack-table">
+                <thead>
+                  <tr>
+                    <th>Operational Query</th>
+                    <th>Result</th>
+                    <th>Verification Details</th>
+                  </tr>
+                </thead>
+                <tbody id="benign-checks-body">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- -----------------------------------------------------------------------
+         TAB 2: AUDIT HISTORY
+         ----------------------------------------------------------------------- -->
+    <div class="tab-pane" id="tab-history">
+      <div class="white-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon-badge">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="card-title" style="font-size: 1rem; margin: 0;">Audit History & Certificates</h2>
+              <div class="card-subtitle">Historical prompt evaluations and remediation records</div>
+            </div>
+          </div>
+          <button type="button" class="btn-soft" id="refresh-history-btn">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Refresh Records
+          </button>
+        </div>
+      </div>
+
+      <div class="history-grid" id="history-grid">
+        <!-- Dynamically rendered history cards -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =========================================================================
+       Vector Detail Slide-over / Modal
+       ========================================================================= -->
+  <div class="modal-backdrop" id="vector-modal">
+    <div class="modal-card">
+      <div id="vector-modal-content"></div>
+      <div style="padding: 1rem 1.5rem; background: var(--surface-subtle); border-top: 1px solid var(--surface-border-subtle); display: flex; justify-content: flex-end;">
+        <button type="button" class="btn-soft" id="close-vector-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Settings Modal
+       ========================================================================= -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="card-header" style="padding: 1.25rem 1.5rem;">
+        <div class="card-title-group">
+          <div class="card-icon-badge">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            </svg>
+          </div>
+          <div class="card-title">System Settings</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding: 1.5rem;">
+        
+        <div class="form-group">
+          <label class="form-label" for="api-url-input">
+            <span>API Server Host</span>
+          </label>
+          <input type="text" id="api-url-input" class="form-control font-mono" value="http://localhost:8000">
+        </div>
+
+        <div class="form-group" style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: var(--radius-md); padding: 0.85rem; margin: 1rem 0;">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-title">Local Simulator Mode</span>
+              <span class="toggle-desc">Runs deterministic audits offline without external models</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="simulator-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <button type="button" class="btn-soft" id="test-health-btn" style="width: 100%; justify-content: center;">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Verify API Connectivity
+          </button>
+          <div id="health-status-output" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;"></div>
+        </div>
+
+      </div>
+      <div style="padding: 1rem 1.5rem; background: var(--surface-subtle); border-top: 1px solid var(--surface-border-subtle); display: flex; justify-content: flex-end; gap: 0.6rem;">
+        <button type="button" class="btn-soft" id="close-settings-modal">Cancel</button>
+        <button type="button" class="btn-launch" id="save-settings-btn" style="width: auto; padding: 0.5rem 1.25rem;">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Application Module Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
 </html>
