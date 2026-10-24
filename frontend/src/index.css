@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,34 +10,62 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #0a0d14;
-  color: #f1f5f9;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #04060A;
+  color: #F8FAFC;
+  overflow-x: hidden;
 }
 
-/* Custom scrollbars */
+/* Tactical Glassmorphism */
+.tactical-card {
+  background: linear-gradient(180deg, rgba(16, 22, 35, 0.8) 0%, rgba(11, 15, 24, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  border-radius: 0.875rem;
+}
+
+.tactical-card-highlight {
+  position: relative;
+}
+.tactical-card-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 242, 254, 0.4) 50%, transparent 100%);
+  border-radius: 0.875rem 0.875rem 0 0;
+}
+
+/* Hairline borders */
+.border-hairline {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.border-hairline-hover:hover {
+  border-color: rgba(0, 242, 254, 0.3);
+}
+
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0d121f;
+  background: #070A10;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #1D273D;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #3D4F75;
 }
 
-/* Subtle glow animations */
-.glow-cyan {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-}
-.glow-red {
-  box-shadow: 0 0 20px rgba(255, 51, 102, 0.2);
-}
-.glow-green {
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+/* Terminal & Code styling */
+code, pre {
+  font-family: 'JetBrains Mono', monospace;
 }

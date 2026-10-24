@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle, X, ShieldAlert, Sparkles, Terminal } from 'lucide-react';
 import Navbar from './components/Navbar';
 import PromptInput from './components/PromptInput';
 import StageProgress from './components/StageProgress';
@@ -14,8 +16,8 @@ export default function App() {
   const [prompt, setPrompt] = useState('');
   const [samples, setSamples] = useState([]);
   const [modelsConfig, setModelsConfig] = useState(null);
-  const [selectedProvider, setSelectedProvider] = useState('ollama');
-  const [selectedModel, setSelectedModel] = useState('llama3.2:latest');
+  const [selectedProvider, setSelectedProvider] = useState('mock');
+  const [selectedModel, setSelectedModel] = useState('simulation-engine-v1');
   const [apiKey, setApiKey] = useState('');
   const [scanScope, setScanScope] = useState('quick');
   const [deepScan, setDeepScan] = useState(false);
@@ -218,7 +220,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-obsidian-950 text-slate-100 flex flex-col font-sans selection:bg-cyber-cyan/20 selection:text-cyber-cyan relative">
+      {/* Background Micro-Grid & Radial Glow */}
+      <div className="fixed inset-0 bg-grid-pattern bg-grid-sm opacity-25 pointer-events-none" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[360px] bg-radial-glow pointer-events-none" />
+
+      {/* Top Navbar */}
       <Navbar
         onOpenHistory={() => setShowHistory(true)}
         onOpenDocs={() => setShowDocs(true)}
@@ -226,19 +233,31 @@ export default function App() {
         provider={selectedProvider}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Error Banner */}
-        {errorMessage && (
-          <div className="p-3.5 rounded-lg bg-rose-950/80 border border-rose-800 text-xs text-rose-200 flex items-center justify-between">
-            <span>{errorMessage}</span>
-            <button
-              onClick={() => setErrorMessage('')}
-              className="text-rose-400 hover:text-white font-bold ml-4"
+      {/* Main Tactical Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 relative z-10">
+        {/* Error Notification Banner */}
+        <AnimatePresence>
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-3.5 rounded-lg bg-rose-950/80 border border-rose-800 text-xs text-rose-200 flex items-center justify-between shadow-lg shadow-rose-950/40"
             >
-              ✕
-            </button>
-          </div>
-        )}
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-cyber-crimson shrink-0" />
+                <span className="font-mono">{errorMessage}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setErrorMessage('')}
+                className="text-rose-400 hover:text-white font-bold ml-4 p-1 rounded hover:bg-rose-900/50 transition"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* 1. Prompt Input & Config Section */}
         <PromptInput
@@ -319,10 +338,18 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-[#0d121e] py-4 text-center text-xs text-slate-500">
-        <p>
-          PromptProof • Built for Vibethon (ENCIDE, Mar Athanasius College of Engineering) • Track: AI for Cybersecurity
-        </p>
+      <footer className="border-t border-white/5 bg-obsidian-950 py-5 text-center text-xs text-slate-500 font-mono relative z-10">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyber-cyan" />
+            <span className="text-slate-400 font-medium">PromptProof Cybernetic Defense Instrument</span>
+            <span className="text-slate-600">|</span>
+            <span className="text-slate-500">Tier L2 Tactical Matrix</span>
+          </div>
+          <div className="text-[11px] text-slate-500">
+            Built for Vibethon • AI for Cybersecurity Track • Deterministic Verification
+          </div>
+        </div>
       </footer>
 
       {/* Modals */}

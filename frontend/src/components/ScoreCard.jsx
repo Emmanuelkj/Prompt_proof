@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShieldCheck, ShieldAlert, AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ShieldCheck, ShieldAlert, AlertTriangle, Info, CheckCircle2, XCircle, Crosshair, Activity } from 'lucide-react';
 
 const CATEGORY_NAMES = {
   indirect_injection: 'Indirect Injection (Data Payload)',
@@ -18,144 +19,224 @@ export default function ScoreCard({ scoreData, totalAttacksCount }) {
   const passed = scoreData?.passed_count ?? 0;
   const failed = scoreData?.failed_count ?? 0;
   const ambiguous = scoreData?.ambiguous_count ?? 0;
-  const total = scoreData?.total_attacks ?? 0;
+  const total = scoreData?.total_attacks ?? totalAttacksCount ?? 0;
 
-  // Color grade based on resistance score
-  const getScoreColor = (score) => {
-    if (score >= 85) return 'text-emerald-400 stroke-emerald-400 from-emerald-500/20';
-    if (score >= 60) return 'text-amber-400 stroke-amber-400 from-amber-500/20';
-    return 'text-rose-500 stroke-rose-500 from-rose-500/20';
+  // Visual grade based on resistance score
+  const getScoreTheme = (score) => {
+    if (score >= 85) {
+      return {
+        text: 'text-cyber-emerald',
+        stroke: '#10B981',
+        glow: 'shadow-glow-emerald',
+        badge: 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80',
+        label: 'Hardened (Strong Resistance)',
+      };
+    }
+    if (score >= 60) {
+      return {
+        text: 'text-cyber-amber',
+        stroke: '#F59E0B',
+        glow: 'shadow-[0_0_20px_-5px_rgba(245,158,11,0.25)]',
+        badge: 'bg-amber-950/80 text-amber-400 border-amber-800/80',
+        label: 'Moderate Vulnerability',
+      };
+    }
+    return {
+      text: 'text-cyber-crimson',
+      stroke: '#F43F5E',
+      glow: 'shadow-glow-crimson',
+      badge: 'bg-rose-950/80 text-rose-400 border-rose-800/80',
+      label: 'Critical Vulnerability',
+    };
   };
 
   const getBarColor = (score) => {
-    if (score >= 85) return 'bg-emerald-500';
-    if (score >= 60) return 'bg-amber-500';
-    return 'bg-rose-500';
+    if (score >= 85) return 'bg-cyber-emerald';
+    if (score >= 60) return 'bg-cyber-amber';
+    return 'bg-cyber-crimson';
   };
 
-  const circumference = 2 * Math.PI * 40;
+  const theme = getScoreTheme(resistance);
+
+  const radius = 48;
+  const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (resistance / 100) * circumference;
 
   return (
-    <div className="bg-[#111726] border border-slate-800 rounded-xl p-5 shadow-xl">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+      className="tactical-card tactical-card-highlight p-5 shadow-2xl"
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-        {/* Animated Resistance Gauge */}
-        <div className="lg:col-span-4 flex flex-col items-center text-center p-4 rounded-xl bg-[#0a0d14]/60 border border-slate-800/80">
-          <div className="relative w-36 h-36 flex items-center justify-center">
+        {/* Left: Cyber Resistance Radar Gauge */}
+        <div className="lg:col-span-4 flex flex-col items-center text-center p-5 rounded-xl bg-obsidian-900/90 border border-white/10 relative overflow-hidden">
+          {/* Subtle radar sweep grid background */}
+          <div className="absolute inset-0 bg-grid-pattern bg-grid-sm opacity-20 pointer-events-none" />
+
+          <div className="relative w-40 h-40 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90">
+              {/* Outer decorative ticks ring */}
               <circle
-                cx="72"
-                cy="72"
-                r="40"
-                stroke="currentColor"
-                strokeWidth="8"
-                className="text-slate-800"
+                cx="80"
+                cy="80"
+                r="64"
+                stroke="rgba(255, 255, 255, 0.05)"
+                strokeWidth="1"
+                strokeDasharray="3 6"
                 fill="transparent"
               />
+              {/* Background Track */}
               <circle
-                cx="72"
-                cy="72"
-                r="40"
-                stroke="currentColor"
+                cx="80"
+                cy="80"
+                r={radius}
+                stroke="#161E30"
                 strokeWidth="8"
-                className={`transition-all duration-700 ease-out ${getScoreColor(resistance)}`}
+                fill="transparent"
+              />
+              {/* Active Resistance Arc */}
+              <circle
+                cx="80"
+                cy="80"
+                r={radius}
+                stroke={theme.stroke}
+                strokeWidth="8"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
                 strokeLinecap="round"
                 fill="transparent"
+                className="transition-all duration-1000 ease-out"
+                style={{
+                  filter: `drop-shadow(0 0 6px ${theme.stroke})`,
+                }}
               />
             </svg>
+
+            {/* Inner Center Display */}
             <div className="absolute flex flex-col items-center">
-              <span className={`text-3xl font-extrabold font-mono tracking-tight ${getScoreColor(resistance).split(' ')[0]}`}>
+              <span className={`text-3xl font-extrabold font-mono tracking-tighter ${theme.text}`}>
                 {resistance}%
               </span>
-              <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">
+              <span className="text-[9px] uppercase font-mono tracking-widest text-slate-400 mt-0.5">
                 Resistance
               </span>
             </div>
           </div>
 
-          <div className="mt-2 text-center">
-            <p className="text-xs font-semibold text-slate-200">
-              Deterministic Vulnerability Score
-            </p>
-            <p className="text-[11px] text-slate-400 mt-0.5 max-w-xs">
+          <div className="mt-2 text-center relative z-10 w-full">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border mb-1.5 font-mono" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+              <span className={`w-1.5 h-1.5 rounded-full ${resistance >= 85 ? 'bg-cyber-emerald' : resistance >= 60 ? 'bg-cyber-amber' : 'bg-cyber-crimson'} animate-pulse`} />
+              <span className={theme.text}>{theme.label}</span>
+            </div>
+
+            <p className="text-[11px] text-slate-300">
               {failed === 0 && total > 0
-                ? `No leak detected in ${total} attacks tested.`
-                : `${failed} of ${total} injection attempts penetrated defenses.`}
+                ? `Zero breaches detected across ${total} attack vectors.`
+                : `${failed} of ${total} injection attacks penetrated defenses.`}
             </p>
-            <div className="mt-2 inline-flex items-center gap-1 text-[10px] text-slate-400 bg-slate-900/90 px-2 py-0.5 rounded border border-slate-800">
-              <Info className="w-3 h-3 text-cyan-400 shrink-0" />
-              <span>Honest framing: A pass is not proof of absolute safety.</span>
+
+            <div className="mt-2.5 inline-flex items-center gap-1.5 text-[10px] text-slate-400 bg-obsidian-950/80 px-2.5 py-1 rounded-md border border-white/5 max-w-xs">
+              <Info className="w-3 h-3 text-cyber-cyan shrink-0" />
+              <span>Honest Metric: Deterministic canary & instruction-marker evaluation.</span>
             </div>
           </div>
         </div>
 
-        {/* Aggregate Counters & Category Breakdown */}
-        <div className="lg:col-span-8 flex flex-col justify-between h-full">
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-4 gap-2 mb-4">
-            <div className="bg-[#0a0d14] border border-slate-800 rounded-lg p-2.5 text-center">
-              <span className="text-[10px] uppercase font-semibold text-slate-400 block">Tested</span>
-              <span className="text-lg font-bold font-mono text-slate-100">{total}</span>
+        {/* Right: Metrics Grid & Breakdown */}
+        <div className="lg:col-span-8 flex flex-col justify-between h-full space-y-4">
+          {/* 4 Stat Boxes */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {/* Total Tested */}
+            <div className="bg-obsidian-900/80 border border-white/10 rounded-lg p-3 text-center">
+              <div className="flex items-center justify-center gap-1 text-[10px] uppercase font-mono tracking-wider text-slate-400 mb-0.5">
+                <Crosshair className="w-3 h-3 text-slate-400" />
+                <span>Tested</span>
+              </div>
+              <span className="text-xl font-bold font-mono text-slate-100">{total}</span>
             </div>
-            <div className="bg-[#0a0d14] border border-slate-800 rounded-lg p-2.5 text-center">
-              <span className="text-[10px] uppercase font-semibold text-emerald-400 block flex items-center justify-center gap-1">
-                <CheckCircle className="w-2.5 h-2.5" /> Passes
-              </span>
-              <span className="text-lg font-bold font-mono text-emerald-400">{passed}</span>
+
+            {/* Passes */}
+            <div className="bg-obsidian-900/80 border border-emerald-950/70 rounded-lg p-3 text-center">
+              <div className="flex items-center justify-center gap-1 text-[10px] uppercase font-mono tracking-wider text-cyber-emerald mb-0.5">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>Passed</span>
+              </div>
+              <span className="text-xl font-bold font-mono text-cyber-emerald">{passed}</span>
             </div>
-            <div className="bg-[#0a0d14] border border-slate-800 rounded-lg p-2.5 text-center">
-              <span className="text-[10px] uppercase font-semibold text-rose-400 block flex items-center justify-center gap-1">
-                <XCircle className="w-2.5 h-2.5" /> Fails
-              </span>
-              <span className="text-lg font-bold font-mono text-rose-400">{failed}</span>
+
+            {/* Fails */}
+            <div className={`bg-obsidian-900/80 rounded-lg p-3 text-center border ${failed > 0 ? 'border-rose-950/90 shadow-glow-crimson/20' : 'border-white/10'}`}>
+              <div className="flex items-center justify-center gap-1 text-[10px] uppercase font-mono tracking-wider text-cyber-crimson mb-0.5">
+                <XCircle className="w-3 h-3" />
+                <span>Breaches</span>
+              </div>
+              <span className="text-xl font-bold font-mono text-cyber-crimson">{failed}</span>
             </div>
-            <div className="bg-[#0a0d14] border border-slate-800 rounded-lg p-2.5 text-center">
-              <span className="text-[10px] uppercase font-semibold text-amber-400 block flex items-center justify-center gap-1">
-                <AlertTriangle className="w-2.5 h-2.5" /> Ambiguous
-              </span>
-              <span className="text-lg font-bold font-mono text-amber-400">{ambiguous}</span>
+
+            {/* Ambiguous */}
+            <div className="bg-obsidian-900/80 border border-amber-950/70 rounded-lg p-3 text-center">
+              <div className="flex items-center justify-center gap-1 text-[10px] uppercase font-mono tracking-wider text-cyber-amber mb-0.5">
+                <AlertTriangle className="w-3 h-3" />
+                <span>Ambiguous</span>
+              </div>
+              <span className="text-xl font-bold font-mono text-cyber-amber">{ambiguous}</span>
             </div>
           </div>
 
-          {/* Per-Category Bars */}
-          <div className="space-y-2 bg-[#0a0d14]/40 border border-slate-800/80 rounded-lg p-3">
-            <span className="text-xs font-semibold text-slate-300 block mb-1">
-              Category Resistance Breakdown
-            </span>
-            {scoreData?.category_scores && Object.entries(scoreData.category_scores).map(([catKey, cat]) => {
-              const label = CATEGORY_NAMES[catKey] || catKey.replace('_', ' ');
-              const catScore = cat.resistance;
-              const isHeadline = catKey === 'indirect_injection';
+          {/* Per-Category Progress Breakdown */}
+          <div className="bg-obsidian-900/60 border border-white/10 rounded-lg p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between pb-1 border-b border-white/5">
+              <span className="text-xs font-heading font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-cyber-cyan" />
+                Vector Category Resistance Breakdown
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">Pass Rate</span>
+            </div>
 
-              return (
-                <div key={catKey} className="text-xs">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className={`font-medium flex items-center gap-1.5 ${isHeadline ? 'text-cyan-300 font-semibold' : 'text-slate-300'}`}>
-                      {label}
-                      {isHeadline && (
-                        <span className="text-[9px] uppercase px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                          Headline
+            <div className="space-y-2 pt-0.5">
+              {scoreData?.category_scores &&
+                Object.entries(scoreData.category_scores).map(([catKey, cat]) => {
+                  const label = CATEGORY_NAMES[catKey] || catKey.replace('_', ' ');
+                  const catScore = cat.resistance;
+                  const isHeadline = catKey === 'indirect_injection';
+
+                  return (
+                    <div key={catKey} className="text-xs group">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium flex items-center gap-1.5 text-slate-300">
+                          <span className={isHeadline ? 'text-cyber-cyan font-semibold' : ''}>
+                            {label}
+                          </span>
+                          {isHeadline && (
+                            <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-cyan-950/80 text-cyber-cyan border border-cyan-800">
+                              Headline
+                            </span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                    <span className="font-mono text-slate-400">
-                      {cat.passed}/{cat.total} passed ({catScore}%)
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${getBarColor(catScore)}`}
-                      style={{ width: `${catScore}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                        <div className="flex items-center gap-2 font-mono text-[11px]">
+                          <span className="text-slate-400">
+                            {cat.passed}/{cat.total}
+                          </span>
+                          <span className={`font-semibold ${catScore >= 85 ? 'text-cyber-emerald' : catScore >= 60 ? 'text-cyber-amber' : 'text-cyber-crimson'}`}>
+                            {catScore}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-obsidian-750 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ease-out ${getBarColor(catScore)}`}
+                          style={{ width: `${catScore}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

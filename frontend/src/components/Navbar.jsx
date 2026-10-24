@@ -1,55 +1,82 @@
 import React from 'react';
-import { Shield, ShieldAlert, Zap, History, ExternalLink, Terminal } from 'lucide-react';
+import { Shield, Activity, History, BookOpen, Terminal, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function Navbar({ onOpenHistory, onOpenDocs, currentModel, provider }) {
   return (
-    <header className="border-b border-slate-800 bg-[#0d1322]/90 backdrop-blur sticky top-0 z-40">
+    <header className="border-b border-white/[0.08] bg-[#070A10]/95 backdrop-blur-xl sticky top-0 z-40">
+      {/* Top micro status bar */}
+      <div className="border-b border-white/[0.04] bg-[#04060A]/80 px-4 py-1 text-[11px] font-mono text-slate-400 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1.5 text-cyan-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              PROMPTPROOF CORE v1.2
+            </span>
+            <span className="text-slate-600 hidden sm:inline">|</span>
+            <span className="text-slate-400 hidden sm:inline">OWASP LLM TOP 10 ADVERSARIAL HARNESS</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-emerald-400 flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> CANARY ENGINE ARMED
+            </span>
+            <span className="text-slate-600">|</span>
+            <span className="text-slate-400 font-mono text-[10px]">VIBETHON CYBERSECURITY</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <Shield className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-3.5">
+          <div className="relative group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 p-[1px] shadow-lg shadow-cyan-500/20">
+              <div className="w-full h-full rounded-[11px] bg-[#070A10] flex items-center justify-center">
+                <Shield className="w-5 h-5 text-cyan-400" />
+              </div>
+            </div>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold tracking-tight text-white font-mono">
-                Prompt<span className="text-cyan-400">Proof</span>
+              <span className="text-lg font-heading font-bold tracking-tight text-white">
+                Prompt<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Proof</span>
               </span>
-              <span className="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 rounded">
-                v1.0
-              </span>
-              <span className="hidden md:inline-flex px-2 py-0.5 text-xs font-medium bg-purple-950/80 text-purple-300 border border-purple-800/60 rounded">
-                Vibethon • AI Cybersecurity
+              <span className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider bg-cyan-950/60 text-cyan-300 border border-cyan-800/50 rounded-full">
+                Audit Suite
               </span>
             </div>
-            <p className="text-xs text-slate-400 hidden sm:block">
-              Deterministic LLM Prompt Injection Tester, Hardener & Regression Engine
+            <p className="text-[11px] text-slate-400 hidden sm:block tracking-wide">
+              Deterministic Prompt Injection Defense & Regression Hardener
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-900 border border-slate-800 text-xs text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-slate-400">Engine:</span>
-            <span className="font-mono text-cyan-400 font-semibold">{currentModel || 'llama3.2:latest'}</span>
-            <span className="text-slate-500">({provider})</span>
+        {/* Right tools & telemetry */}
+        <div className="flex items-center gap-2.5">
+          {/* Active Model Indicator */}
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0B0F18] border border-white/[0.08] text-xs">
+            <Activity className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-slate-400 text-[11px]">Runtime:</span>
+            <span className="font-mono text-cyan-300 font-semibold text-[11px]">{currentModel || 'llama3.2:latest'}</span>
+            <span className="text-[10px] text-slate-500 uppercase px-1.5 py-0.2 rounded bg-white/[0.04]">
+              {provider}
+            </span>
           </div>
 
           <button
             onClick={onOpenHistory}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-            title="View previous test runs"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#0E1420] hover:bg-[#141C2D] text-slate-200 border border-white/[0.08] hover:border-white/[0.15] transition active:scale-[0.98]"
+            title="View Audit Run History"
           >
             <History className="w-3.5 h-3.5 text-slate-400" />
-            <span className="hidden sm:inline">Run History</span>
+            <span className="hidden sm:inline">Audit Log</span>
           </button>
 
           <button
             onClick={onOpenDocs}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-cyan-950/60 to-blue-950/60 hover:from-cyan-900/60 hover:to-blue-900/60 text-cyan-300 border border-cyan-500/30 hover:border-cyan-500/50 transition active:scale-[0.98]"
           >
             <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="hidden sm:inline">How It Works</span>
+            <span className="hidden sm:inline">Architecture & Q&A</span>
           </button>
         </div>
       </div>
