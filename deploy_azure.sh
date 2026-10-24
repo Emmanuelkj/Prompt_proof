@@ -86,7 +86,7 @@ NGINX_CONF="/etc/nginx/sites-available/promptproof"
 sudo bash -c "cat <<EOF > $NGINX_CONF
 server {
     listen 80;
-    server_name _;
+    server_name promptproof.duckdns.org _;
 
     client_max_body_size 20M;
 

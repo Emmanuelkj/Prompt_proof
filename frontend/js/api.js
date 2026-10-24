@@ -9,7 +9,13 @@ import {
 
 class ApiService {
   constructor() {
-    this.baseUrl = localStorage.getItem('promptproof_base_url') || 'http://localhost:8000';
+    const saved = localStorage.getItem('promptproof_base_url');
+    // Default to promptproof.duckdns.org:8000
+    if (!saved || saved === 'http://localhost:8000') {
+      this.baseUrl = 'http://promptproof.duckdns.org:8000';
+    } else {
+      this.baseUrl = saved;
+    }
     this.useSimulator = localStorage.getItem('promptproof_use_simulator') === 'true';
     this.activeEventSource = null;
     this.simulatorTimer = null;

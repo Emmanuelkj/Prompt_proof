@@ -29,6 +29,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Allow CORS for promptproof.duckdns.org and local environments
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "app": "PromptProof", "version": "1.0.0"}

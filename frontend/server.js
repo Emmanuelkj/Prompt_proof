@@ -4,7 +4,7 @@ const path = require('path');
 const url = require('url');
 
 const PORT = process.env.PORT || 3000;
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://promptproof.duckdns.org:8000';
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
